@@ -3,7 +3,7 @@ import vtkTriangleFilter from "@kitware/vtk.js/Filters/General/TriangleFilter";
 
 import type { ScenePayload, GeometryPayload } from "@/types";
 
-export const parseVTP = async (file: File): Promise<ScenePayload> => {
+export const vtpParser = async (file: File): Promise<ScenePayload> => {
 	const buf = new Uint8Array(await file.arrayBuffer());
 	const reader = vtkXMLPolyDataReader.newInstance();
 	reader.parseAsArrayBuffer(buf.buffer);

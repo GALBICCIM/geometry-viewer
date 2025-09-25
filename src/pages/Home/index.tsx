@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { useFileStore } from "@/stores";
-import { parseVTP } from "@/lib";
+import { vtpParser } from "@/lib";
 
 import * as S from "./styled";
 
@@ -22,7 +22,7 @@ const Home = () => {
 		let payload;
 
 		if (ext === "vtp") {
-			payload = await parseVTP(selectedFile);
+			payload = await vtpParser(selectedFile);
 		} else {
 			alert(`we not support ${ext}`);
 
