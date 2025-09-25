@@ -1,4 +1,5 @@
-import { SceneCanvas } from "@/components";
+import { BrowserRouter as Router } from "react-router-dom";
+import AppRoutes from "@/routes/AppRoutes";
 
 import { GlobalStyle } from "@/styles";
 
@@ -6,7 +7,9 @@ const App = () => {
 	return (
 		<>
 			<GlobalStyle />
-			<SceneCanvas />
+			<Router>
+				<AppRoutes />
+			</Router>
 		</>
 	);
 };
