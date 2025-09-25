@@ -5,20 +5,24 @@ import { parseVTP } from "@/lib";
 import * as S from "./styled";
 
 const Home = () => {
-	const file = useFileStore((state) => state.file);
-	const setFile = useFileStore((state) => state.setFile);
 	const navigator = useNavigate();
+	const selectedFile = useFileStore((state) => state.selectedFile);
+	const files = useFileStore((state) => state.files);
+	const setFile = useFileStore((state) => state.setFile);
+	const addFile = useFileStore((state) => state.addFile);
+
+	const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => addFile(event.target.files?.[0] ?? null);
 
 	const handleButtonClick = async () => {
-		if (!file) return;
+		if (!selectedFile) return;
 
-		const ext = file.name.split(".").pop()?.toLowerCase();
+		const ext = selectedFile.name.split(".").pop()?.toLowerCase();
 		if (!ext) return;
 
 		let payload;
 
 		if (ext === "vtp") {
-			payload = await parseVTP(file);
+			payload = await parseVTP(selectedFile);
 		} else {
 			alert(`we not support ${ext}`);
 
@@ -29,14 +33,23 @@ const Home = () => {
 	};
 
 	return (
-		<S.Container>
-			<>
-				<S.FileInput type="file" id="input-file" accept=".vtp" onChange={(event) => setFile(event.target.files?.[0] ?? null)} />
-				<S.FileInputLabel htmlFor="input-file">File Upload</S.FileInputLabel>
-			</>
-			{file && <S.Text>selected: {file.name}</S.Text>}
-			<S.GoViewer onClick={handleButtonClick}>Go!</S.GoViewer>
-		</S.Container>
+		<>
+			<S.Container>
+				<S.FileSelectMenu>
+					<S.Wrapper width="100%" justify="space-around" items="center">
+						<S.Text color="black">Geometries ({files.length})</S.Text>
+						<S.FileInputLabel htmlFor="input-file">+</S.FileInputLabel>
+					</S.Wrapper>
+					{files.map((file, index) => (
+						<S.FileSelectButton isSelected={selectedFile === file} onClick={() => setFile(files[index])}>
+							{file.name}
+						</S.FileSelectButton>
+					))}
+				</S.FileSelectMenu>
+				<S.GoViewer onClick={handleButtonClick}>Go!</S.GoViewer>
+			</S.Container>
+			<S.FileInput type="file" id="input-file" accept=".vtp" onChange={handleFileUpload} />
+		</>
 	);
 };
 
