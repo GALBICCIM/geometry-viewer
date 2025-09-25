@@ -20,7 +20,7 @@ const Viewer = () => {
 
 	return (
 		<S.Container>
-			<S.GoRoot onClick={() => navigate("/")}>Upload another file</S.GoRoot>
+			<S.GoRoot onClick={() => navigate("/")}>See another file</S.GoRoot>
 			<BabylonCanvas payload={payload} />
 		</S.Container>
 	);
