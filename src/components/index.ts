@@ -1,1 +1,1 @@
-export { default as SceneCanvas } from "./SceneCanvas";
+export { default as BabylonCanvas } from "./BabylonCanvas";
