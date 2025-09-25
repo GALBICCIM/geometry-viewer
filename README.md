@@ -20,4 +20,5 @@ npm run dev
 - React + Typescript
 - Babylon.js
 - VTK.js
+- Zustand
 - styled-components
