@@ -3,29 +3,30 @@ import vtkTriangleFilter from "@kitware/vtk.js/Filters/General/TriangleFilter";
 
 import type { ScenePayload, GeometryPayload } from "@/types";
 
-export async function parseVTP(file: File): Promise<ScenePayload> {
+export const parseVTP = async (file: File): Promise<ScenePayload> => {
 	const buf = new Uint8Array(await file.arrayBuffer());
-
 	const reader = vtkXMLPolyDataReader.newInstance();
 	reader.parseAsArrayBuffer(buf.buffer);
+
 	let poly = reader.getOutputData();
 
-	// 폴리곤이 있을 수 있으니 삼각화
 	const tri = vtkTriangleFilter.newInstance();
 	tri.setInputData(poly);
 	tri.update();
 	poly = tri.getOutputData();
 
-	const pts = Array.from(poly.getPoints().getData()) as number[]; // Float32Array → number[]
-	const cells = poly.getPolys().getData(); // VTK Cell Array
+	const pts = Array.from(poly.getPoints().getData()) as number[];
+	const cells = poly.getPolys().getData();
 
 	const indices: number[] = [];
 	for (let i = 0; i < cells.length; ) {
-		const n = cells[i++]; // 이 셀의 버텍스 개수
+		const n = cells[i++];
 		const base = i;
+
 		for (let k = 1; k < n - 1; k++) {
 			indices.push(cells[base], cells[base + k], cells[base + k + 1]);
 		}
+
 		i += n;
 	}
 
@@ -36,4 +37,4 @@ export async function parseVTP(file: File): Promise<ScenePayload> {
 	};
 
 	return { items: [geom] };
-}
+};

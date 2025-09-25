@@ -7,7 +7,7 @@ import type { ScenePayload } from "@/types/geometry";
 
 import * as S from "./styled";
 
-export default function Viewer() {
+const Viewer = () => {
 	const navigate = useNavigate();
 	const { state } = useLocation();
 	const payload = state as ScenePayload | undefined;
@@ -24,4 +24,6 @@ export default function Viewer() {
 			<BabylonCanvas payload={payload} />
 		</S.Container>
 	);
-}
+};
+
+export default Viewer;

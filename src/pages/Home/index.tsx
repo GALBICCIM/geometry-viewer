@@ -4,7 +4,7 @@ import { parseVTP } from "@/lib";
 
 import * as S from "./styled";
 
-export default function Home() {
+const Home = () => {
 	const file = useFileStore((state) => state.file);
 	const setFile = useFileStore((state) => state.setFile);
 	const navigator = useNavigate();
@@ -38,4 +38,6 @@ export default function Home() {
 			<S.GoViewer onClick={handleButtonClick}>Go!</S.GoViewer>
 		</S.Container>
 	);
-}
+};
+
+export default Home;
