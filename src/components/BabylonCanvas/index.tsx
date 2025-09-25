@@ -24,20 +24,18 @@ const BabylonCanvas = ({ payload }: BabylonCanvasProps) => {
 		const camera = new BABYLON.ArcRotateCamera("cam", Math.PI / 2, Math.PI / 2.5, 10, BABYLON.Vector3.Zero(), scene);
 		camera.attachControl(canvas, true);
 
-		const light = new BABYLON.PointLight("pl", camera.position.clone(), scene);
-		new BABYLON.HemisphericLight("hl", new BABYLON.Vector3(0, 1, 0), scene);
-		light.intensity = 1.2;
-
-		scene.registerBeforeRender(() => {
-			light.position.copyFrom(camera.position);
-		});
+		const hemi = new BABYLON.HemisphericLight("hemi", new BABYLON.Vector3(0, 1, 0), scene);
+		hemi.intensity = 1.1;
+		hemi.groundColor = new BABYLON.Color3(1, 1, 1);
 
 		engine.runRenderLoop(() => scene.render());
 
-		window.addEventListener("resize", () => engine.resize());
+		const onResize = () => engine.resize();
+
+		window.addEventListener("resize", onResize);
 
 		return () => {
-			window.removeEventListener("resize", () => engine.resize());
+			window.removeEventListener("resize", onResize);
 			engine.dispose();
 		};
 	}, []);
@@ -76,7 +74,7 @@ const BabylonCanvas = ({ payload }: BabylonCanvasProps) => {
 			mat.alpha = 1; // 불투명
 			mat.sideOrientation = BABYLON.Material.CounterClockWiseSideOrientation;
 			mesh.material = mat;
-			mat.albedoColor = new BABYLON.Color3(0.85, 0.85, 0.85); // 밝은 회색
+			mat.albedoColor = new BABYLON.Color3(0.6, 0.6, 0.6);
 			mat.metallic = 0;
 			mat.roughness = 0.5;
 
