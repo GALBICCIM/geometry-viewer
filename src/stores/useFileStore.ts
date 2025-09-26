@@ -12,8 +12,16 @@ export const useFileStore = create<FileStore>((set) => ({
 	files: [],
 	setFile: (selectedFile) => set({ selectedFile }),
 	addFile: (file) => {
-		if (file !== null) {
-			set((state) => ({ files: [file, ...state.files] }));
+		if (file) {
+			set((state) => {
+				const newFiles = [file, ...state.files].filter(
+					(f, i, arr) =>
+						arr.findIndex((ff) => ff.name === f.name && ff.size === f.size && ff.type === f.type && ff.lastModified === f.lastModified) ===
+						i
+				);
+
+				return { files: newFiles };
+			});
 		}
 	},
 }));
