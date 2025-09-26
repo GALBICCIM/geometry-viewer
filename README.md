@@ -14,6 +14,7 @@ npm run dev
 ## Supported File Formats
 
 - `.vtp`
+- `.h5`
 
 ## Tech Stack
 
