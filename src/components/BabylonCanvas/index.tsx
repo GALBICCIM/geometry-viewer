@@ -102,20 +102,27 @@ const BabylonCanvas = ({ payload }: BabylonCanvasProps) => {
 				v.normals = normals;
 			}
 
-			const hasVertexColors = !!item.vertexColors && item.vertexColors.length === item.positions.length;
+			const n = item.positions.length / 3;
+			const isRGB = !!item.vertexColors && item.vertexColors.length === 3 * n;
+			const isRGBA = !!item.vertexColors && item.vertexColors.length === 4 * n;
+			const hasVertexColors = isRGB || isRGBA;
+
 			if (hasVertexColors) {
-				const colors: number[] = new Array((item.vertexColors!.length / 3) * 4);
-				for (let i = 0, j = 0; i < item.vertexColors!.length; i += 3, j += 4) {
-					colors[j] = item.vertexColors![i];
-					colors[j + 1] = item.vertexColors![i + 1];
-					colors[j + 2] = item.vertexColors![i + 2];
-					colors[j + 3] = 1;
+				const colors = new Float32Array(4 * n);
+				if (isRGB) {
+					for (let i = 0, j = 0; i < item.vertexColors!.length; i += 3, j += 4) {
+						colors[j] = item.vertexColors![i];
+						colors[j + 1] = item.vertexColors![i + 1];
+						colors[j + 2] = item.vertexColors![i + 2];
+						colors[j + 3] = 1;
+					}
+				} else {
+					colors.set(item.vertexColors!);
 				}
 				v.colors = colors;
 			}
 
 			v.applyToMesh(mesh);
-			mesh.flipFaces(true);
 			mesh.parent = root;
 
 			const solidColor = NAME_SOLID_COLOR[item.name];
