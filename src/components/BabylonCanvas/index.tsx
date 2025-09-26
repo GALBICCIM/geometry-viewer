@@ -1,8 +1,9 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import * as BABYLON from "@babylonjs/core";
 
 import type { ScenePayload } from "@/types";
 
+import CameraStatus from "../CameraStatus";
 import { Canvas } from "./styled";
 
 type BabylonCanvasProps = { payload: ScenePayload };
@@ -16,6 +17,7 @@ const BabylonCanvas = ({ payload }: BabylonCanvasProps) => {
 	const canvasRef = useRef<HTMLCanvasElement>(null);
 	const engineRef = useRef<BABYLON.Engine | null>(null);
 	const sceneRef = useRef<BABYLON.Scene | null>(null);
+	const [cameraInfo, setCameraInfo] = useState<{ alpha: number; beta: number; radius: number; target: BABYLON.Vector3 } | null>(null);
 
 	useEffect(() => {
 		const canvas = canvasRef.current!;
@@ -26,16 +28,47 @@ const BabylonCanvas = ({ payload }: BabylonCanvasProps) => {
 		sceneRef.current = scene;
 		scene.clearColor = new BABYLON.Color4(1, 1, 1, 1);
 
-		const camera = new BABYLON.ArcRotateCamera("cam", Math.PI / 2, Math.PI / 2.5, 10, BABYLON.Vector3.Zero(), scene);
+		const camera = new BABYLON.ArcRotateCamera("cam", 0, 0, 10, BABYLON.Vector3.Zero(), scene);
 		camera.attachControl(canvas, true);
 		camera.lowerBetaLimit = null;
 		camera.upperBetaLimit = null;
 
+		// 메시 중심 계산 후 target 정렬
+		setTimeout(() => {
+			if (scene.meshes.length > 0) {
+				const bounds = scene.meshes.reduce(
+					(acc, m) => {
+						if (!m.getBoundingInfo) return acc;
+						const bb = m.getBoundingInfo().boundingBox;
+						acc.min = BABYLON.Vector3.Minimize(acc.min, bb.minimumWorld);
+						acc.max = BABYLON.Vector3.Maximize(acc.max, bb.maximumWorld);
+						return acc;
+					},
+					{
+						min: new BABYLON.Vector3(Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY),
+						max: new BABYLON.Vector3(Number.NEGATIVE_INFINITY, Number.NEGATIVE_INFINITY, Number.NEGATIVE_INFINITY),
+					}
+				);
+				const center = bounds.min.add(bounds.max).scale(0.5);
+				camera.setTarget(center);
+			}
+		}, 0);
 		const hemi = new BABYLON.HemisphericLight("hemi", new BABYLON.Vector3(0, 1, 0), scene);
 		hemi.intensity = 1.1;
 		hemi.groundColor = new BABYLON.Color3(1, 1, 1);
 
-		engine.runRenderLoop(() => scene.render());
+		engine.runRenderLoop(() => {
+			scene.render();
+			const cam = scene.activeCamera as BABYLON.ArcRotateCamera;
+			if (cam) {
+				setCameraInfo({
+					alpha: cam.alpha,
+					beta: cam.beta,
+					radius: cam.radius,
+					target: cam.target.clone(),
+				});
+			}
+		});
 		const onResize = () => engine.resize();
 		window.addEventListener("resize", onResize);
 
@@ -51,6 +84,7 @@ const BabylonCanvas = ({ payload }: BabylonCanvasProps) => {
 
 		scene.meshes.slice().forEach((m) => m.dispose());
 		const root = new BABYLON.TransformNode("root", scene);
+		root.rotation = new BABYLON.Vector3(-Math.PI / 2, 0, 0);
 
 		for (const item of payload.items) {
 			const mesh = new BABYLON.Mesh(item.name, scene);
@@ -177,7 +211,19 @@ const BabylonCanvas = ({ payload }: BabylonCanvasProps) => {
 		cam.panningSensibility = basePanningSensibility * logScale;
 	}, [payload]);
 
-	return <Canvas ref={canvasRef} />;
+	return (
+		<>
+			{cameraInfo && (
+				<CameraStatus
+					alpha={cameraInfo.alpha.toFixed(3)}
+					beta={cameraInfo.beta.toFixed(3)}
+					radius={cameraInfo.radius.toFixed(3)}
+					target={cameraInfo.target}
+				/>
+			)}
+			<Canvas ref={canvasRef} />
+		</>
+	);
 };
 
 export default BabylonCanvas;
