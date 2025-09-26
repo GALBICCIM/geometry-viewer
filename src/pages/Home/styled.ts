@@ -1,6 +1,6 @@
 import styled from "styled-components";
 
-import type * as Type from "./styled.type";
+import type * as T from "./styled.type";
 
 export const Container = styled.div`
 	width: 100vw;
@@ -12,7 +12,7 @@ export const Container = styled.div`
 	gap: 4rem;
 `;
 
-export const Wrapper = styled.div<Type.WrapperProps>`
+export const Wrapper = styled.div<T.WrapperProps>`
 	width: ${({ width }) => width || "auto"};
 	height: ${({ height }) => height || "auto"};
 	display: flex;
@@ -22,7 +22,7 @@ export const Wrapper = styled.div<Type.WrapperProps>`
 	gap: ${({ gap }) => `${gap}` || 0}px;
 `;
 
-export const Text = styled.p<Type.TextProps>`
+export const Text = styled.p<T.TextProps>`
 	color: ${({ color }) => color};
 	font-size: 3rem;
 `;
@@ -58,7 +58,7 @@ export const FileSelectMenu = styled.div`
 	padding: 20px;
 `;
 
-export const FileSelectButton = styled.button<Type.FileSelectButtonProps>`
+export const FileSelectButton = styled.button<T.FileSelectButtonProps>`
 	width: 100%;
 	background-color: ${({ isSelected }) => (isSelected ? "azure" : "ghostwhite")};
 	padding: 20px 40px;

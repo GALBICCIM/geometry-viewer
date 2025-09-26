@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { useFileStore } from "@/stores";
-import { vtpParser } from "@/lib";
+import { sceneRouter } from "@/loaders";
 
 import * as S from "./styled";
 
@@ -16,20 +16,15 @@ const Home = () => {
 	const handleButtonClick = async () => {
 		if (!selectedFile) return;
 
-		const ext = selectedFile.name.split(".").pop()?.toLowerCase();
-		if (!ext) return;
+		try {
+			const payload = await sceneRouter(selectedFile);
 
-		let payload;
-
-		if (ext === "vtp") {
-			payload = await vtpParser(selectedFile);
-		} else {
-			alert(`we not support ${ext}`);
+			navigator("/view", { state: payload });
+		} catch (e) {
+			console.error(e);
 
 			return;
 		}
-
-		navigator("/view", { state: payload });
 	};
 
 	return (
@@ -38,17 +33,20 @@ const Home = () => {
 				<S.FileSelectMenu>
 					<S.Wrapper width="100%" justify="space-around" items="center">
 						<S.Text color="black">Geometries ({files.length})</S.Text>
-						<S.FileInputLabel htmlFor="input-file">+</S.FileInputLabel>
+						<S.FileInputLabel htmlFor="input-file">
+							<span style={{ transform: "translateY(5px)" }}>+</span>
+						</S.FileInputLabel>
 					</S.Wrapper>
-					{files.map((file, index) => (
-						<S.FileSelectButton isSelected={selectedFile === file} onClick={() => setFile(files[index])}>
-							{file.name}
-						</S.FileSelectButton>
-					))}
+					{files &&
+						files.map((file, index) => (
+							<S.FileSelectButton key={index} isSelected={selectedFile === file} onClick={() => setFile(files[index])}>
+								{file.name}
+							</S.FileSelectButton>
+						))}
 				</S.FileSelectMenu>
 				<S.GoViewer onClick={handleButtonClick}>Go!</S.GoViewer>
 			</S.Container>
-			<S.FileInput type="file" id="input-file" accept=".vtp" onChange={handleFileUpload} />
+			<S.FileInput type="file" id="input-file" accept=".vtp,.h5" onChange={handleFileUpload} />
 		</>
 	);
 };
