@@ -4,7 +4,7 @@ export type GeometryPayload = {
 	indices: number[];
 	normals?: number[];
 	color?: [number, number, number] | undefined;
-	vertexColors?: number[]; // [r,g,b,r,g,b,...] vertex별 색상
+	vertexColors?: number[];
 };
 
 export type ScenePayload = {

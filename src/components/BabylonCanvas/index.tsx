@@ -2,13 +2,14 @@ import { useEffect, useRef } from "react";
 import * as BABYLON from "@babylonjs/core";
 
 import type { ScenePayload } from "@/types";
+
 import { Canvas } from "./styled";
 
 type BabylonCanvasProps = { payload: ScenePayload };
 
 const NAME_SOLID_COLOR: Record<string, BABYLON.Color3> = {
-	rbe2: new BABYLON.Color3(1, 0.835, 0), // 노란색
-	rbe3: new BABYLON.Color3(0.117, 0.564, 1), // 파란색
+	rbe2: new BABYLON.Color3(1, 0.835, 0), // yellow
+	rbe3: new BABYLON.Color3(0.117, 0.564, 1), // blue
 };
 
 const BabylonCanvas = ({ payload }: BabylonCanvasProps) => {
@@ -67,7 +68,6 @@ const BabylonCanvas = ({ payload }: BabylonCanvasProps) => {
 				v.normals = normals;
 			}
 
-			// ▼ vertexColors가 있으면 RGB → RGBA 변환하여 적용
 			const hasVertexColors = !!item.vertexColors && item.vertexColors.length === item.positions.length;
 			if (hasVertexColors) {
 				const colors: number[] = new Array((item.vertexColors!.length / 3) * 4);
@@ -75,7 +75,7 @@ const BabylonCanvas = ({ payload }: BabylonCanvasProps) => {
 					colors[j] = item.vertexColors![i];
 					colors[j + 1] = item.vertexColors![i + 1];
 					colors[j + 2] = item.vertexColors![i + 2];
-					colors[j + 3] = 1; // alpha
+					colors[j + 3] = 1;
 				}
 				v.colors = colors;
 			}
@@ -84,7 +84,6 @@ const BabylonCanvas = ({ payload }: BabylonCanvasProps) => {
 			mesh.flipFaces(true);
 			mesh.parent = root;
 
-			// ▼ 머터리얼: rbe2/rbe3는 단색 강제, 아니면 vertexColors 우선, 그 외 회색
 			const solidColor = NAME_SOLID_COLOR[item.name];
 			if (solidColor) {
 				const mat = new BABYLON.PBRMaterial(`${item.name}-mat`, scene);
@@ -93,14 +92,14 @@ const BabylonCanvas = ({ payload }: BabylonCanvasProps) => {
 				mat.sideOrientation = BABYLON.Material.CounterClockWiseSideOrientation;
 				mat.metallic = 0;
 				mat.roughness = 0.5;
-				mat.albedoColor = solidColor; // 노랑/파랑 강제
+				mat.albedoColor = solidColor;
 				mesh.material = mat;
 			} else if (hasVertexColors) {
 				const mat = new BABYLON.StandardMaterial(`${item.name}-mat`, scene);
 				mat.backFaceCulling = false;
 				mat.alpha = 1;
 				mat.sideOrientation = BABYLON.Material.CounterClockWiseSideOrientation;
-				mat.specularColor = new BABYLON.Color3(0, 0, 0); // 유광 완전 제거
+				mat.specularColor = new BABYLON.Color3(0, 0, 0);
 				mesh.material = mat;
 			} else {
 				const mat = new BABYLON.PBRMaterial(`${item.name}-mat`, scene);
@@ -113,7 +112,6 @@ const BabylonCanvas = ({ payload }: BabylonCanvasProps) => {
 				mesh.material = mat;
 			}
 
-			// 엣지 라인
 			const positions = item.positions;
 			const indices = item.indices;
 			const edgeSet = new Set<string>();
@@ -147,7 +145,6 @@ const BabylonCanvas = ({ payload }: BabylonCanvasProps) => {
 			}
 		}
 
-		// 카메라 프레이밍
 		const cam = scene.activeCamera as BABYLON.ArcRotateCamera;
 		const bounds = scene.meshes.reduce(
 			(acc, m) => {
