@@ -60,7 +60,7 @@ export const FileSelectMenu = styled.div`
 
 export const FileSelectButton = styled.button<T.FileSelectButtonProps>`
 	width: 100%;
-	background-color: ${({ isSelected }) => (isSelected ? "azure" : "ghostwhite")};
+	background-color: ${({ isSelected }) => (isSelected ? "CornflowerBlue" : "ghostwhite")};
 	padding: 20px 40px;
 	border: none;
 	border-radius: 20px;
