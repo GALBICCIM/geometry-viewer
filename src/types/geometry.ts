@@ -10,3 +10,7 @@ export type GeometryPayload = {
 export type ScenePayload = {
 	items: GeometryPayload[];
 };
+
+export interface BabylonCanvasProps {
+	payload: ScenePayload;
+}

@@ -1,12 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 import * as BABYLON from "@babylonjs/core";
 
-import type { ScenePayload } from "@/types";
+import type { BabylonCanvasProps, CameraInfo } from "@/types";
 
 import CameraStatus from "../CameraStatus";
 import { Canvas } from "./styled";
-
-type BabylonCanvasProps = { payload: ScenePayload };
 
 const NAME_SOLID_COLOR: Record<string, BABYLON.Color3> = {
 	rbe2: BABYLON.Color3.Yellow(), // yellow
@@ -17,7 +15,7 @@ const BabylonCanvas = ({ payload }: BabylonCanvasProps) => {
 	const canvasRef = useRef<HTMLCanvasElement>(null);
 	const engineRef = useRef<BABYLON.Engine | null>(null);
 	const sceneRef = useRef<BABYLON.Scene | null>(null);
-	const [cameraInfo, setCameraInfo] = useState<{ alpha: number; beta: number; radius: number; target: BABYLON.Vector3 } | null>(null);
+	const [cameraInfo, setCameraInfo] = useState<CameraInfo | null>(null);
 
 	useEffect(() => {
 		const canvas = canvasRef.current!;
@@ -225,9 +223,9 @@ const BabylonCanvas = ({ payload }: BabylonCanvasProps) => {
 			{cameraInfo && (
 				<CameraStatus
 					name={payload.items[0]?.name ?? "-"}
-					alpha={cameraInfo.alpha.toFixed(3)}
-					beta={cameraInfo.beta.toFixed(3)}
-					radius={cameraInfo.radius.toFixed(0)}
+					alpha={cameraInfo.alpha}
+					beta={cameraInfo.beta}
+					radius={cameraInfo.radius}
 					target={cameraInfo.target}
 				/>
 			)}
