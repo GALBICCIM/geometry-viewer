@@ -1,11 +1,17 @@
 import styled from "styled-components";
 
 export const Container = styled.div`
-	background-color: ghostwhite;
-	border-radius: 10px;
-	padding: 8px 14px;
-	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+	display: flex;
+	flex-direction: column;
+	gap: 0.75rem;
+	padding: 1rem;
+	position: absolute;
+	top: 16%;
+	left: 6%;
 	z-index: 10;
+	border: 2px solid black;
+	border-radius: 10px;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 	pointer-events: none;
 `;
 
