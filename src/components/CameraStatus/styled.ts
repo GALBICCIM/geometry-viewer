@@ -3,7 +3,7 @@ import styled from "styled-components";
 export const Container = styled.div`
 	display: flex;
 	flex-direction: column;
-	gap: 0.75rem;
+	gap: 1.75rem;
 	padding: 1rem;
 	position: absolute;
 	top: 16%;
@@ -15,8 +15,14 @@ export const Container = styled.div`
 	pointer-events: none;
 `;
 
-export const Text = styled.p`
+export const Wrapper = styled.div`
+	display: flex;
+	flex-direction: column;
+	gap: 0.75rem;
+`;
+
+export const Text = styled.p<{ size: number }>`
 	font-family: monospace;
-	font-size: 1rem;
+	font-size: ${({ size }) => size}rem;
 	color: black;
 `;
