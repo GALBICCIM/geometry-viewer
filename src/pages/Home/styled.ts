@@ -7,6 +7,7 @@ export const Container = styled.div`
 	height: 100vh;
 	background-color: black;
 	display: flex;
+	flex-direction: column;
 	justify-content: center;
 	align-items: center;
 	gap: 4rem;
@@ -20,6 +21,12 @@ export const Wrapper = styled.div<T.WrapperProps>`
 	justify-content: ${({ justify }) => justify || "normal"};
 	align-items: ${({ items }) => items || "normal"};
 	gap: ${({ gap }) => `${gap}` || 0}px;
+`;
+
+export const ItemWrapper = styled.div`
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	gap: 10px;
 `;
 
 export const Text = styled.p<T.TextProps>`
@@ -46,13 +53,12 @@ export const FileInputLabel = styled.label`
 `;
 
 export const FileSelectMenu = styled.div`
-	width: 32rem;
 	background-color: white;
 	display: flex;
 	flex-direction: column;
 	justify-content: center;
 	align-items: center;
-	gap: 10px;
+	gap: 2rem;
 	border: none;
 	border-radius: 15px;
 	padding: 20px;
@@ -67,6 +73,10 @@ export const FileSelectButton = styled.button<T.FileSelectButtonProps>`
 	font-size: 1.75rem;
 	text-align: center;
 	cursor: pointer;
+
+	&:hover {
+		opacity: 50%;
+	}
 `;
 
 export const GoViewer = styled.button`
