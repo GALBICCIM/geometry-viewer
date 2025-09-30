@@ -3,7 +3,7 @@ import { toNumberArray, getFirstDataset, normalizeZeroBased } from "@/utils";
 
 import type { ScenePayload, GeometryPayload } from "@/types";
 
-import { PATHS } from "@/constants/h5";
+import { PATHS } from "@/constants";
 
 export async function h5Parser(file: File): Promise<ScenePayload> {
 	const { FS } = await h5wasm.ready;
