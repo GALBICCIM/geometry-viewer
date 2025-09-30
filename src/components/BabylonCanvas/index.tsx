@@ -224,6 +224,7 @@ const BabylonCanvas = ({ payload }: BabylonCanvasProps) => {
 		<>
 			{cameraInfo && (
 				<CameraStatus
+					name={payload.items[0]?.name ?? "-"}
 					alpha={cameraInfo.alpha.toFixed(3)}
 					beta={cameraInfo.beta.toFixed(3)}
 					radius={cameraInfo.radius.toFixed(0)}
