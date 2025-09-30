@@ -8,7 +8,7 @@ pnpm-debug.log*
 lerna-debug.log*
 
 node_modules
-geometrys
+geometries
 dist
 dist-ssr
 *.local
