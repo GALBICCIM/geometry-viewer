@@ -15,7 +15,7 @@ const CameraStatus = ({ alpha, beta, radius, target }: StatusProps) => (
 		<S.Text>beta: {beta}</S.Text>
 		<S.Text>radius: {radius}</S.Text>
 		<S.Text>
-			target: [{target._x}, {target._y}, {target._z}]
+			target: [ x: {target._x.toFixed(3)}, y: {target._y.toFixed(3)}, z: {target._z.toFixed(3)} ]
 		</S.Text>
 	</S.Container>
 );

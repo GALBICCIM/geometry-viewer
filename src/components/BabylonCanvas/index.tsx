@@ -9,8 +9,8 @@ import { Canvas } from "./styled";
 type BabylonCanvasProps = { payload: ScenePayload };
 
 const NAME_SOLID_COLOR: Record<string, BABYLON.Color3> = {
-	rbe2: new BABYLON.Color3(1, 0.835, 0), // yellow
-	rbe3: new BABYLON.Color3(0.117, 0.564, 1), // blue
+	rbe2: BABYLON.Color3.Yellow(), // yellow
+	rbe3: BABYLON.Color3.Blue(), // blue
 };
 
 const BabylonCanvas = ({ payload }: BabylonCanvasProps) => {
@@ -32,6 +32,8 @@ const BabylonCanvas = ({ payload }: BabylonCanvasProps) => {
 		camera.attachControl(canvas, true);
 		camera.lowerBetaLimit = null;
 		camera.upperBetaLimit = null;
+		camera.lowerRadiusLimit = 25;
+		camera.upperRadiusLimit = 450;
 
 		// 메시 중심 계산 후 target 정렬
 		setTimeout(() => {
@@ -224,7 +226,7 @@ const BabylonCanvas = ({ payload }: BabylonCanvasProps) => {
 				<CameraStatus
 					alpha={cameraInfo.alpha.toFixed(3)}
 					beta={cameraInfo.beta.toFixed(3)}
-					radius={cameraInfo.radius.toFixed(3)}
+					radius={cameraInfo.radius.toFixed(0)}
 					target={cameraInfo.target}
 				/>
 			)}
