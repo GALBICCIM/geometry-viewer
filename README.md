@@ -2,6 +2,8 @@
 
 A project for visualizing 3D models.
 
+⚠️ Do not rename the sample file ⚠️
+
 ## How to Use
 
 ```bash
