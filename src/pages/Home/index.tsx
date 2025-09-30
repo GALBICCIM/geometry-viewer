@@ -11,7 +11,9 @@ const Home = () => {
 	const setFile = useFileStore((state) => state.setFile);
 	const addFile = useFileStore((state) => state.addFile);
 
-	const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => addFile(event.target.files?.[0] ?? null);
+	const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => addFile(event.target.files ?? null);
+
+	const handleSelectGeometry = (index: number) => setFile(files[index]);
 
 	const handleButtonClick = async () => {
 		if (!selectedFile) return;
@@ -39,14 +41,14 @@ const Home = () => {
 					</S.Wrapper>
 					{files &&
 						files.map((file, index) => (
-							<S.FileSelectButton key={index} isSelected={selectedFile === file} onClick={() => setFile(files[index])}>
+							<S.FileSelectButton key={index} isSelected={selectedFile === file} onClick={() => handleSelectGeometry(index)}>
 								{file.name}
 							</S.FileSelectButton>
 						))}
 				</S.FileSelectMenu>
 				<S.GoViewer onClick={handleButtonClick}>Go!</S.GoViewer>
 			</S.Container>
-			<S.FileInput type="file" id="input-file" accept=".vtp,.h5" onChange={handleFileUpload} />
+			<S.FileInput type="file" id="input-file" accept=".vtp,.h5" multiple onChange={handleFileUpload} />
 		</>
 	);
 };
