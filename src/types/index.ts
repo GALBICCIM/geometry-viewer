@@ -1,2 +1,2 @@
-export * from "./geometry";
+export * from "./babylon";
 export * from "./camera";

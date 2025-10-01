@@ -3,8 +3,12 @@ export type GeometryPayload = {
 	positions: number[];
 	indices: number[];
 	normals?: number[];
-	color?: [number, number, number] | undefined;
 	vertexColors?: number[];
+	indexGroups?: {
+		rbe2: [number, number]; // [startIndex, indexCount]
+		rbe3: [number, number];
+		base: [number, number];
+	};
 };
 
 export type ScenePayload = {
