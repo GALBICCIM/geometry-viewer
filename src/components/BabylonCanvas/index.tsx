@@ -7,8 +7,8 @@ import CameraStatus from "../CameraStatus";
 import { Canvas } from "./styled";
 
 const NAME_SOLID_COLOR: Record<string, BABYLON.Color3> = {
-	rbe2: BABYLON.Color3.Yellow(), // yellow
-	rbe3: BABYLON.Color3.Blue(), // blue
+	rbe2: BABYLON.Color3.Red(),
+	rbe3: BABYLON.Color3.Blue(),
 };
 
 const BabylonCanvas = ({ payload }: BabylonCanvasProps) => {
@@ -147,7 +147,7 @@ const BabylonCanvas = ({ payload }: BabylonCanvasProps) => {
 				mat.backFaceCulling = false;
 				mat.alpha = 1;
 				mat.sideOrientation = BABYLON.Material.CounterClockWiseSideOrientation;
-				mat.albedoColor = new BABYLON.Color3(0.8, 0.8, 0.8);
+				mat.albedoColor = new BABYLON.Color3(1, 1, 1);
 				mat.metallic = 0;
 				mat.roughness = 0.5;
 				mesh.material = mat;

@@ -5,6 +5,15 @@ import type { ScenePayload, GeometryPayload } from "@/types";
 
 import { PATHS } from "@/constants";
 
+const triColorFor = (a: number, b: number, c: number, rbe2: Set<number>, rbe3: Set<number>) => {
+	const has2 = rbe2.has(a) || rbe2.has(b) || rbe2.has(c);
+	const has3 = rbe3.has(a) || rbe3.has(b) || rbe3.has(c);
+
+	if (has2) return [1, 0.35, 0.35];
+	if (has3) return [0.35, 0.35, 1];
+	return [1, 1, 1];
+};
+
 export async function h5Parser(file: File): Promise<ScenePayload> {
 	const { FS } = await h5wasm.ready;
 	const ab = await file.arrayBuffer();
@@ -52,15 +61,31 @@ export async function h5Parser(file: File): Promise<ScenePayload> {
 			)
 		);
 
-		const vertexColors: number[] = Array.from({ length: nVerts }, (_, i) =>
-			rbe2Set.has(i) ? [1, 1, 0] : rbe3Set.has(i) ? [0, 0, 1] : [0.9, 0.9, 0.9]
-		).flat();
+		const newPositions: number[] = [];
+		const newIndices: number[] = [];
+		const newVertexColors: number[] = []; // RGB(혹은 RGBA)
+
+		for (let i = 0; i < indices.length; i += 3) {
+			const a = indices[i],
+				b = indices[i + 1],
+				c = indices[i + 2];
+			const color = triColorFor(a, b, c, rbe2Set, rbe3Set); // [r,g,b]
+
+			const base = newPositions.length / 3;
+
+			for (const v of [a, b, c]) {
+				newPositions.push(positions[v * 3], positions[v * 3 + 1], positions[v * 3 + 2]);
+				newVertexColors.push(color[0], color[1], color[2]);
+			}
+
+			newIndices.push(base, base + 1, base + 2);
+		}
 
 		const geom: GeometryPayload = {
-			name: file.name, // 하나의 메시로 내보냄
-			positions,
-			indices,
-			vertexColors,
+			name: file.name,
+			positions: newPositions,
+			indices: newIndices,
+			vertexColors: newVertexColors,
 		};
 
 		return { items: [geom] };
