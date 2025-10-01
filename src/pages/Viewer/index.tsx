@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 
 import { BabylonCanvas } from "@/components";
 
-import type { ScenePayload } from "@/types/geometry";
+import type { ScenePayload } from "@/types";
 
 import * as S from "./styled";
 
