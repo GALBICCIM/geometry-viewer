@@ -24,7 +24,7 @@ const BabylonCanvas = ({ payload }: BabylonCanvasProps) => {
 
 		const scene = new BABYLON.Scene(engine);
 		sceneRef.current = scene;
-		scene.clearColor = new BABYLON.Color4(1, 1, 1, 1);
+		scene.clearColor = new BABYLON.Color4(0.95, 0.95, 1, 1);
 
 		const camera = new BABYLON.ArcRotateCamera("cam", 0, 0, 10, BABYLON.Vector3.Zero(), scene);
 		camera.attachControl(canvas, true);
