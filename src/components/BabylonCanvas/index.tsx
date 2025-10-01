@@ -105,9 +105,9 @@ const BabylonCanvas = ({ payload }: BabylonCanvasProps) => {
 			const n = item.positions.length / 3;
 			const isRGB = !!item.vertexColors && item.vertexColors.length === 3 * n;
 			const isRGBA = !!item.vertexColors && item.vertexColors.length === 4 * n;
-			const hasVertexColors = isRGB || isRGBA;
+			const hasVC = isRGB || isRGBA;
 
-			if (hasVertexColors) {
+			if (hasVC) {
 				const colors = new Float32Array(4 * n);
 				if (isRGB) {
 					for (let i = 0, j = 0; i < item.vertexColors!.length; i += 3, j += 4) {
@@ -125,32 +125,77 @@ const BabylonCanvas = ({ payload }: BabylonCanvasProps) => {
 			v.applyToMesh(mesh);
 			mesh.parent = root;
 
-			const solidColor = NAME_SOLID_COLOR[item.name];
-			if (solidColor) {
-				const mat = new BABYLON.PBRMaterial(`${item.name}-mat`, scene);
-				mat.backFaceCulling = false;
-				mat.alpha = 1;
-				mat.sideOrientation = BABYLON.Material.CounterClockWiseSideOrientation;
-				mat.metallic = 0;
-				mat.roughness = 0.5;
-				mat.albedoColor = solidColor;
-				mesh.material = mat;
-			} else if (hasVertexColors) {
-				const mat = new BABYLON.StandardMaterial(`${item.name}-mat`, scene);
-				mat.backFaceCulling = false;
-				mat.alpha = 1;
-				mat.sideOrientation = BABYLON.Material.CounterClockWiseSideOrientation;
-				mat.specularColor = new BABYLON.Color3(0, 0, 0);
-				mesh.material = mat;
+			if (item.indexGroups) {
+				const mm = new BABYLON.MultiMaterial(`${item.name}-mm`, scene);
+
+				const matRBE2 = new BABYLON.PBRMaterial(`${item.name}-rbe2`, scene);
+				matRBE2.backFaceCulling = false;
+				matRBE2.metallic = 0;
+				matRBE2.roughness = 0.5;
+				matRBE2.albedoColor = new BABYLON.Color3(1, 0.2, 0.2);
+
+				const matRBE3 = new BABYLON.PBRMaterial(`${item.name}-rbe3`, scene);
+				matRBE3.backFaceCulling = false;
+				matRBE3.metallic = 0;
+				matRBE3.roughness = 0.5;
+				matRBE3.albedoColor = new BABYLON.Color3(0.2, 0.2, 1);
+
+				const matBase = new BABYLON.PBRMaterial(`${item.name}-base`, scene);
+				matBase.backFaceCulling = false;
+				matBase.metallic = 0;
+				matBase.roughness = 0.5;
+				matBase.albedoColor = new BABYLON.Color3(0.9, 0.9, 0.9);
+
+				mm.subMaterials = [matRBE2, matRBE3, matBase];
+				mesh.material = mm;
+
+				const totalVerts = n;
+				const [r2Start, r2Count] = item.indexGroups.rbe2;
+				const [r3Start, r3Count] = item.indexGroups.rbe3;
+				const [baseStart, baseCnt] = item.indexGroups.base;
+
+				mesh.subMeshes?.forEach((sm) => sm.dispose());
+				mesh.subMeshes = [];
+				BABYLON.SubMesh.AddToMesh(0, 0, totalVerts, r2Start, r2Count, mesh); // rbe2
+				BABYLON.SubMesh.AddToMesh(1, 0, totalVerts, r3Start, r3Count, mesh); // rbe3
+				BABYLON.SubMesh.AddToMesh(2, 0, totalVerts, baseStart, baseCnt, mesh); // base
 			} else {
-				const mat = new BABYLON.PBRMaterial(`${item.name}-mat`, scene);
-				mat.backFaceCulling = false;
-				mat.alpha = 1;
-				mat.sideOrientation = BABYLON.Material.CounterClockWiseSideOrientation;
-				mat.albedoColor = new BABYLON.Color3(1, 1, 1);
-				mat.metallic = 0;
-				mat.roughness = 0.5;
-				mesh.material = mat;
+				const solidColor = NAME_SOLID_COLOR[item.name];
+
+				if (hasVC) {
+					const mat = new BABYLON.StandardMaterial(`${item.name}-mat`, scene);
+
+					mat.backFaceCulling = false;
+					mat.alpha = 1;
+					mat.sideOrientation = BABYLON.Material.CounterClockWiseSideOrientation;
+					mat.diffuseColor = new BABYLON.Color3(1, 1, 1);
+					mat.specularColor = new BABYLON.Color3(0, 0, 0);
+					/* eslint-disable @typescript-eslint/no-explicit-any */
+					(mat as any).useVertexColors = true;
+					(mat as any).useVertexAlpha = !!isRGBA;
+					/* eslint-enable @typescript-eslint/no-explicit-any */
+					mesh.material = mat;
+				} else if (solidColor) {
+					const mat = new BABYLON.PBRMaterial(`${item.name}-mat`, scene);
+
+					mat.backFaceCulling = false;
+					mat.alpha = 1;
+					mat.sideOrientation = BABYLON.Material.CounterClockWiseSideOrientation;
+					mat.metallic = 0;
+					mat.roughness = 0.5;
+					mat.albedoColor = solidColor;
+					mesh.material = mat;
+				} else {
+					const mat = new BABYLON.PBRMaterial(`${item.name}-mat`, scene);
+
+					mat.backFaceCulling = false;
+					mat.alpha = 1;
+					mat.sideOrientation = BABYLON.Material.CounterClockWiseSideOrientation;
+					mat.albedoColor = new BABYLON.Color3(1, 1, 1);
+					mat.metallic = 0;
+					mat.roughness = 0.5;
+					mesh.material = mat;
+				}
 			}
 
 			const positions = item.positions;

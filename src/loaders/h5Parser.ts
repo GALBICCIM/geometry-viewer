@@ -5,13 +5,13 @@ import type { ScenePayload, GeometryPayload } from "@/types";
 
 import { PATHS } from "@/constants";
 
-const triColorFor = (a: number, b: number, c: number, rbe2: Set<number>, rbe3: Set<number>) => {
+const classifyFace = (a: number, b: number, c: number, rbe2: Set<number>, rbe3: Set<number>): "rbe2" | "rbe3" | "base" => {
 	const has2 = rbe2.has(a) || rbe2.has(b) || rbe2.has(c);
 	const has3 = rbe3.has(a) || rbe3.has(b) || rbe3.has(c);
 
-	if (has2) return [1, 0.35, 0.35];
-	if (has3) return [0.35, 0.35, 1];
-	return [1, 1, 1];
+	if (has2) return "rbe2";
+	if (has3) return "rbe3";
+	return "base";
 };
 
 export async function h5Parser(file: File): Promise<ScenePayload> {
@@ -37,12 +37,11 @@ export async function h5Parser(file: File): Promise<ScenePayload> {
 		const dsSurf = getFirstDataset(f, PATHS.surfaces);
 		if (!dsSurf) throw new Error("HDF5: 'surfaces' dataset not found.");
 
-		let indices = toNumberArray(dsSurf.value as ArrayLike<number>).map(Number);
 		const nVerts = positions.length / 3;
-		indices = normalizeZeroBased(indices, nVerts);
+		const indicesRaw = normalizeZeroBased(toNumberArray(dsSurf.value as ArrayLike<number>).map(Number), nVerts);
 
 		if (positions.length % 3 !== 0) console.warn("positions length % 3 != 0");
-		if (indices.length % 3 !== 0) console.warn("indices length % 3 != 0");
+		if (indicesRaw.length % 3 !== 0) console.warn("indices length % 3 != 0");
 
 		const rbe2Set = new Set(
 			normalizeZeroBased(
@@ -61,34 +60,39 @@ export async function h5Parser(file: File): Promise<ScenePayload> {
 			)
 		);
 
-		const newPositions: number[] = [];
-		const newIndices: number[] = [];
-		const newVertexColors: number[] = []; // RGB(혹은 RGBA)
+		const rbe2Index: number[] = [];
+		const rbe3Index: number[] = [];
+		const baseIndex: number[] = [];
 
-		for (let i = 0; i < indices.length; i += 3) {
-			const a = indices[i],
-				b = indices[i + 1],
-				c = indices[i + 2];
-			const color = triColorFor(a, b, c, rbe2Set, rbe3Set); // [r,g,b]
+		for (let i = 0; i < indicesRaw.length; i += 3) {
+			const a = indicesRaw[i],
+				b = indicesRaw[i + 1],
+				c = indicesRaw[i + 2];
+			const tag = classifyFace(a, b, c, rbe2Set, rbe3Set);
 
-			const base = newPositions.length / 3;
-
-			for (const v of [a, b, c]) {
-				newPositions.push(positions[v * 3], positions[v * 3 + 1], positions[v * 3 + 2]);
-				newVertexColors.push(color[0], color[1], color[2]);
+			if (tag === "rbe2") {
+				rbe2Index.push(a, b, c);
+			} else if (tag === "rbe3") {
+				rbe3Index.push(a, b, c);
+			} else {
+				baseIndex.push(a, b, c);
 			}
-
-			newIndices.push(base, base + 1, base + 2);
 		}
 
-		const geom: GeometryPayload = {
+		const indices = rbe2Index.concat(rbe3Index, baseIndex);
+
+		const geometry: GeometryPayload = {
 			name: file.name,
-			positions: newPositions,
-			indices: newIndices,
-			vertexColors: newVertexColors,
+			positions,
+			indices,
+			indexGroups: {
+				rbe2: [0, rbe2Index.length],
+				rbe3: [rbe2Index.length, rbe3Index.length],
+				base: [rbe2Index.length + rbe3Index.length, baseIndex.length],
+			},
 		};
 
-		return { items: [geom] };
+		return { items: [geometry] };
 	} finally {
 		f.close();
 	}
